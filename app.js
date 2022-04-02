@@ -7,58 +7,60 @@ const app = express();
 
 app.set("view engine", "ejs");
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost:27017/wikiDB")
+mongoose.connect("mongodb://localhost:27017/wikiDB");
 
 const articleSchema = {
-    title: String,
-    content: String
+  title: String,
+  content: String,
 };
 
 const Article = mongoose.model("Article", articleSchema);
 
-app.get("/articles", function(req, res){
-    Article.find(function(err, foundArticles){
-        // console.log(foundArticles);
-        if(!err){
-            res.send(foundArticles);
-        }else {
-            res.send(err);
-        }
-        
-    });
-});
+app
+  .route("/articles")
 
-app.post("/articles", function(req, res){
+  .get(function (req, res) {
+    Article.find(function (err, foundArticles) {
+      // console.log(foundArticles);
+      if (!err) {
+        res.send(foundArticles);
+      } else {
+        res.send(err);
+      }
+    });
+  })
+
+  .post(function (req, res) {
     console.log(req.body.title);
-    console.log(req.body.content); 
+    console.log(req.body.content);
     // to adding to the mongodn database
-     const newArticle = new Article({
-         title: req.body.title,
-         content: req.body.content
-     });
-     newArticle.save(function(err){
-         if(!err){
-             res.send("Successfully added a new article.")
-         }else {
-             res.send(err);
-         }
-     });
-});
-
-app.delete("/articles", function(req, res){
-    Article.deleteMany(function(err){
-        if(!err){
-            res.send("successfully deleted all articles")
-        }else {
-            res.send(err);
-        }
+    const newArticle = new Article({
+      title: req.body.title,
+      content: req.body.content,
     });
-});
+    newArticle.save(function (err) {
+      if (!err) {
+        res.send("Successfully added a new article.");
+      } else {
+        res.send(err);
+      }
+    });
+  })
 
-app.listen(3000, function(){
-    console.log("Server started in Port number 3000");
+  .delete(function (req, res) {
+    Article.deleteMany(function (err) {
+      if (!err) {
+        res.send("successfully deleted all articles");
+      } else {
+        res.send(err);
+      }
+    });
+  });
+
+app.listen(3000, function () {
+  console.log("Server started in Port number 3000");
 });
